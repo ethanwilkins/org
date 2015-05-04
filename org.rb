@@ -9,6 +9,7 @@
 # save user paths and network data
 
 # library modules
+require 'fileutils'
 require 'rbconfig'
 require 'nokogiri'
 require 'ipaddr'
@@ -23,6 +24,10 @@ class Org
 	def live
 		puts "\nI'm alive!\n"
 		inspect; inquire; output
+	end
+	
+	def remember
+	  @memory = File.open("out.xml", 'a+')
 	end
 	
 	def inspect
@@ -48,6 +53,10 @@ class Org
 	  	f.write("#{xml_string}")
 	  end
 	  puts xml_string
+	end
+	
+	def multiply
+	
 	end
 	
 	def scan input
