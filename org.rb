@@ -8,27 +8,78 @@
 # path names to read or write in
 # save user paths and network data
 
+# library modules
+require 'rbconfig'
+require 'nokogiri'
+require 'ipaddr'
+require 'uri'
+
 class Org
-	def initialize input
+	def initialize
+    @data = {}
+	end
+	
+	# needs to react based on os and wd
+	def live
+		puts "\nI'm alive!\n"
+		inspect; inquire; output
+	end
+	
+	def inspect
+    @data[:os] = "<os>#{detect_os}</os>"
+    @data[:wd] = "<wd>#{detect_wd}</wd>"
+	end
+	
+	def inquire
+    puts "\nWhat's up?"
+    input = gets; puts "\n"
 		input.slice! "\n" # cleans up input
-		@data = "<input>#{input}</input>\n"
-		@data << "<os>#{detect_os}</os>\n"
+		@data[:input] = "<input>#{input}</input>"
 		scan input
 	end
 	
-	def live
-	  File.open("out.xml", 'w') do |f|
-	  	f.write("#{@data}")
+	def output
+		xml_string = "\n<org>\n"
+	  @data.each do |key, val|
+	    xml_string << "\t#{val}\n"
 	  end
-		puts @data + "\n"
+	  xml_string << "</org>\n"
+	  File.open("out.xml", 'a+') do |f|
+	  	f.write("#{xml_string}")
+	  end
+	  puts xml_string
 	end
 	
 	def scan input
 		for line in input.split("\n")
 			for word in line.split(" ")
-				@data << detect_ip(word)
-				@data << detect_web(word)
+				@data[:ip] = "<ip>#{detect_ip(word)}</ip>"
+				@data[:web] = "<web>#{detect_web(word)}</web>"
+				@data[:path] = "<path>#{detect_path(word)}</path>"
+				@data[:cmd] = "<cmd>#{detect_cmd(word)}</cmd>"
 			end
+		end
+	end
+  
+  def detect_cmd cmd
+  	case cmd.to_sym
+  	when :speak
+  		puts "\nHello!\n"
+  		return cmd
+  	when :output
+  		puts @data
+  		return cmd
+  	else
+  		return ""
+  	end
+  end
+	
+	def detect_path path
+		if (path.include? "/" or path.include? "\\") \
+			and not (path.include? "\\\\" or path.include? "//")
+			return path
+		else
+			return ""
 		end
 	end
 	
@@ -43,6 +94,14 @@ class Org
 	def detect_ip ip
 		if /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\Z/ =~ ip
 			return ip
+		else
+			return ""
+		end
+	end
+	
+	def detect_wd
+		unless Dir.pwd.nil?
+			return Dir.pwd.to_s
 		else
 			return ""
 		end

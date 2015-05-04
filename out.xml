@@ -1,2 +1,100 @@
-<input>test</input>
-<os>linux</os>
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>speak</input>
+	
+	
+	
+	speak
+</org><org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>stuff</input>
+	
+	
+	
+	
+</org><org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>speak</input>
+	
+	
+	
+	speak
+</org><org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>speak</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd>speak</cmd>
+</org>
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>test</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd></cmd>
+</org>
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>output</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd>output</cmd>
+</org>
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>output</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd>output</cmd>
+</org>
+
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>speak</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd>speak</cmd>
+</org>
+
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>test</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd></cmd>
+</org>
+
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>this and that</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd></cmd>
+</org>
+
+<org>
+	<os>linux</os>
+	<wd>/home/ethan/Code/ruby/org</wd>
+	<input>speak</input>
+	<ip></ip>
+	<web></web>
+	<path></path>
+	<cmd>speak</cmd>
+</org>
