@@ -2,136 +2,131 @@
 # saves data in xml files inside folder
 # orgs send messages to central server
 
-# can take data to manipulate or act on
+# can take data to
+# manipulate or act on
 # ip addresses to connect to
 # web addresses to screen scrape
 # path names to read or write in
 # save user paths and network data
+# needs to react based on os and wd
+# needs to use simple_xml gem
 
-# library modules
+require 'socket'
 require 'fileutils'
-require 'rbconfig'
-require 'nokogiri'
-require 'ipaddr'
-require 'uri'
+
+# modules
+require './detect'
+require './utils'
 
 class Org
+	include Detect, Utils
+	attr :memory, :data
+	
 	def initialize
+    @memory = {}
     @data = {}
 	end
 	
-	# needs to react based on os and wd
 	def live
 		puts "\nI'm alive!\n"
-		inspect; inquire; output
+		remember; inspect
+		inquire; output
 	end
 	
+	def multiply
+		target = target_path
+		if @data[:os] and @data[:wd]
+      case @data[:os]
+      when "linux", "macosx"
+				FileUtils.cp_r @data[:wd], target
+      when "windows"
+      end
+		end
+	end
+	
+	# chdir and list dirs
+	# in each dir until access level reached
+	def explore_dirs
+		
+	end
+	
+	# needs error checking in
+	# case target path unreachable
+	def target_path
+		target = ""
+		slash = @data[:os].eql?("windows") ? "\\" : "/"
+		@data[:wd].split(slash).each do |dir|
+			if count_char(target, slash) < @data[:depth] - 2
+				target << (dir.empty? ? "" : slash) + dir
+			end
+		end
+		return target
+	end
+	
+	def tcp_client host, port
+    puts "Connecting to server...\n"
+		s = TCPSocket.new host.to_s, port.to_i
+		while line = s.gets
+			puts line
+		end
+		s.close
+	end
+	
+	def tcp_server port
+    puts "Server running..."
+		server = TCPServer.new port.to_i
+		loop do
+			Thread.start(server.accept) do |client|
+				client.puts "\nHello! Time is #{Time.now}!\n"
+				client.close
+			end
+		end
+	end
+  
+  private
+	
 	def remember
-	  @memory = File.open("out.xml", 'a+')
+    @data[:in_xml] = ""
+	  File.open("out.xml", 'a+').each_line do |l|
+      @data[:in_xml] << l
+    end
 	end
 	
 	def inspect
-    @data[:os] = "<os>#{detect_os}</os>"
-    @data[:wd] = "<wd>#{detect_wd}</wd>"
-	end
+    @data[:time] = Time.now.to_s
+    @data[:wd] = detect_wd
+    @data[:os] = detect_os
+    @data[:depth] = detect_depth
+  end
 	
 	def inquire
     puts "\nWhat's up?"
     input = gets; puts "\n"
 		input.slice! "\n" # cleans up input
-		@data[:input] = "<input>#{input}</input>"
+		@data[:input] = input
 		scan input
 	end
 	
 	def output
 		xml_string = "\n<org>\n"
 	  @data.each do |key, val|
-	    xml_string << "\t#{val}\n"
+	    xml_string << "\t<#{key}>#{val}</#{key}>\n"
 	  end
 	  xml_string << "</org>\n"
 	  File.open("out.xml", 'a+') do |f|
 	  	f.write("#{xml_string}")
 	  end
-	  puts xml_string
-	end
-	
-	def multiply
-	
+    @data[:out_xml] = xml_string
 	end
 	
 	def scan input
 		for line in input.split("\n")
 			for word in line.split(" ")
-				@data[:ip] = "<ip>#{detect_ip(word)}</ip>"
-				@data[:web] = "<web>#{detect_web(word)}</web>"
-				@data[:path] = "<path>#{detect_path(word)}</path>"
-				@data[:cmd] = "<cmd>#{detect_cmd(word)}</cmd>"
+				@data[:ip] = detect_ip(word)
+				@data[:web] = detect_web(word)
+				@data[:path] = detect_path(word)
+				@data[:cmd] = detect_cmd(word)
 			end
 		end
 	end
-  
-  def detect_cmd cmd
-  	case cmd.to_sym
-  	when :speak
-  		puts "\nHello!\n"
-  		return cmd
-  	when :output
-  		puts @data
-  		return cmd
-  	else
-  		return ""
-  	end
-  end
-	
-	def detect_path path
-		if (path.include? "/" or path.include? "\\") \
-			and not (path.include? "\\\\" or path.include? "//")
-			return path
-		else
-			return ""
-		end
-	end
-	
-	def detect_web addr
-		if /\A#{URI::regexp}\z/ =~ addr
-			return addr
-		else
-			return ""
-		end
-	end
-	
-	def detect_ip ip
-		if /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\Z/ =~ ip
-			return ip
-		else
-			return ""
-		end
-	end
-	
-	def detect_wd
-		unless Dir.pwd.nil?
-			return Dir.pwd.to_s
-		else
-			return ""
-		end
-	end
-
-  def detect_os
-    os ||= (
-      host_os = RbConfig::CONFIG['host_os']
-      case host_os
-      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-        :windows
-      when /darwin|mac os/
-        :macosx
-      when /linux/
-        :linux
-      when /solaris|bsd/
-        :unix
-      else
-        raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-      end
-    )
-    return os.to_s if os
-  end
 end
